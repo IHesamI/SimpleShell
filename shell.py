@@ -3,12 +3,18 @@ import os
 import signal
 
 def handle_sigint(sig, frame):
+    # Print a newline to move to a new line after the interrupted command
     print("\n")
 
+# Register the SIGINT signal handler
 signal.signal(signal.SIGINT, handle_sigint)
+
+# Customizable prompt
+prompt = "$ "
+
 while True:
     # Prompt for user input
-    command = input("$ ")
+    command = input(prompt)
 
     # Exit the shell if the user enters 'exit' or 'quit'
     if command.lower() in ['exit', 'quit']:
@@ -34,10 +40,8 @@ while True:
 
     # Execute the command using subprocess
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        if result.stdout:
-            print(result.stdout)
-        if result.stderr:
-            print(result.stderr)
+        result = subprocess.run(command, shell=True)
+        if result.returncode != 0:
+            print("Command failed with exit code:", result.returncode)
     except Exception as e:
         print("Error:", e)
